@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#0f0e17"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Jiana"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<title>Jiana's School Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg0:#0f0e17; --bg1:#1a1927; --bg2:#22213a; --bg3:#2a2945;
+  --acc:#7f77dd; --acc2:#534ab7; --acc3:#3c3489;
+  --gold:#fac775; --gold2:#ef9f27; --gold3:#ba7517;
+  --green:#5dcaa5; --green2:#1d9e75; --green3:#085041;
+  --coral:#f0997b; --coral2:#d85a30; --coral3:#993c1d;
+  --pink:#ed93b1; --pink2:#d4537e; --pink3:#72243e;
+  --teal:#9fe1cb; --teal2:#1d9e75;
+  --text:#f0efeb; --text2:#a0a09a; --text3:#686864;
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14);
+  --r:16px; --r2:12px; --r3:8px;
+  --font:'Nunito',sans-serif; --font2:'Nunito Sans',sans-serif;
+  --safe-top: env(safe-area-inset-top,0px);
+  --safe-bot: env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg0);}
+body{font-family:var(--font);color:var(--text);display:flex;flex-direction:column;}
+
+/* ── Layout ── */
+.app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top);}
+.topbar{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left h1{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.topbar-left p{font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--font2);}
+
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 16px 16px;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* ── Bottom nav ── */
+.nav{display:flex;background:var(--bg1);border-top:0.5px solid var(--border);flex-shrink:0;padding-bottom:var(--safe-bot);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;border:none;background:none;color:var(--text3);font-family:var(--font);font-size:10px;font-weight:600;transition:color 0.15s;}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.15s;}
+.nav-btn.active{color:var(--acc);}
+.nav-btn.active svg{transform:scale(1.1);}
+
+/* ── Sections ── */
+.section{display:none;animation:fadeUp 0.2s ease;}
+.section.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Cards ── */
+.card{background:var(--bg1);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.card-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;font-family:var(--font2);}
+.card-head{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+
+/* ── Day banner ── */
+.day-banner{background:var(--bg2);border-radius:var(--r);padding:18px 16px;margin-bottom:12px;position:relative;overflow:hidden;}
+.day-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:var(--acc);opacity:0.08;border-radius:50%;}
+.day-banner-day{font-size:28px;font-weight:900;color:var(--text);letter-spacing:-0.5px;}
+.day-banner-date{font-size:13px;color:var(--text2);margin-top:2px;font-family:var(--font2);}
+.day-banner-sub{font-size:12px;color:var(--acc);margin-top:6px;font-weight:700;}
+
+/* ── Books strip ── */
+.books-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.book-pill{background:var(--bg2);border:0.5px solid var(--border2);border-radius:100px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px;}
+.book-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;}
+
+/* ── Schedule list ── */
+.sched-list{display:flex;flex-direction:column;gap:0;}
+.sched-item{display:flex;align-items:stretch;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
+.sched-item:last-child{border-bottom:none;}
+.sched-time-col{width:80px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;}
+.sched-period{font-size:10px;color:var(--text3);font-family:var(--font2);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+.sched-time{font-size:12px;color:var(--text2);font-family:var(--font2);margin-top:2px;line-height:1.3;}
+.sched-content{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.sched-subj{display:flex;align-items:center;gap:8px;}
+.sched-teacher{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--font2);}
+.break-item{background:var(--bg2);border-radius:var(--r3);padding:8px 12px;margin:4px 0;display:flex;align-items:center;gap:10px;border-bottom:none!important;}
+.break-item .sched-time-col{width:80px;}
+.break-dot{width:8px;height:8px;border-radius:50%;background:var(--gold2);flex-shrink:0;}
+.break-label{font-size:12px;color:var(--gold2);font-weight:700;letter-spacing:0.04em;font-family:var(--font2);}
+
+/* ── Subject badges ── */
+.sbadge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:0.01em;}
+.s-math   {background:rgba(55,138,221,0.15);color:#85b7eb;}
+.s-eng    {background:rgba(99,153,34,0.15);color:#97c459;}
+.s-hindi  {background:rgba(186,117,23,0.15);color:#fac775;}
+.s-evs    {background:rgba(29,158,117,0.15);color:#9fe1cb;}
+.s-marathi{background:rgba(212,83,126,0.15);color:#ed93b1;}
+.s-comp   {background:rgba(127,119,221,0.15);color:#afa9ec;}
+.s-other  {background:rgba(136,135,128,0.15);color:#b4b2a9;}
+
+/* ── HW items ── */
+.hw-card{background:var(--bg2);border-radius:var(--r2);padding:14px;margin-bottom:8px;border-left:3px solid var(--acc);}
+.hw-card.done{opacity:0.45;border-left-color:var(--green2);}
+.hw-top{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;}
+.hw-task{font-size:14px;font-weight:600;color:var(--text);margin:6px 0 6px;line-height:1.4;}
+.hw-task.done-text{text-decoration:line-through;color:var(--text3);}
+.hw-meta{font-size:11px;color:var(--text3);font-family:var(--font2);}
+.hw-books{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.hw-book{background:var(--bg3);border-radius:100px;padding:3px 9px;font-size:11px;color:var(--text2);font-family:var(--font2);}
+.hw-actions{display:flex;gap:6px;margin-top:10px;}
+
+/* ── Buttons ── */
+.btn{padding:9px 16px;border-radius:var(--r3);border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
+.btn:active{transform:scale(0.96);}
+.btn-primary{background:var(--acc2);color:#fff;}
+.btn-green{background:rgba(29,158,117,0.2);color:var(--green);}
+.btn-ghost{background:var(--bg3);color:var(--text2);}
+.btn-danger{background:rgba(216,90,48,0.15);color:var(--coral);}
+.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold2));color:#1a0a00;box-shadow:0 2px 12px rgba(239,159,39,0.3);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* ── Form elements ── */
+input[type=text],input[type=date],select,textarea{
+  width:100%;background:var(--bg2);border:0.5px solid var(--border2);
+  border-radius:var(--r3);padding:11px 14px;font-size:14px;font-family:var(--font);
+  color:var(--text);outline:none;-webkit-appearance:none;
+}
+input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--acc);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23686864' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px;font-family:var(--font2);text-transform:uppercase;letter-spacing:0.05em;}
+.form-group{margin-bottom:14px;}
+
+/* ── Upload zone ── */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:24px 16px;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.upload-zone:active{background:var(--bg2);border-color:var(--acc);}
+.upload-zone p{font-size:14px;color:var(--text2);font-weight:600;margin-bottom:4px;}
+.upload-zone small{font-size:12px;color:var(--text3);font-family:var(--font2);}
+.upload-icon{font-size:32px;margin-bottom:8px;}
+#preview-img{width:100%;border-radius:var(--r2);margin-top:12px;max-height:220px;object-fit:contain;display:none;}
+
+
+/* ── Metrics row ── */
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.metric{background:var(--bg2);border-radius:var(--r2);padding:12px 10px;text-align:center;}
+.metric-val{font-size:24px;font-weight:900;color:var(--text);}
+.metric-lbl{font-size:10px;color:var(--text3);font-family:var(--font2);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
+
+/* ── Notes/alerts ── */
+.note{border-radius:var(--r3);padding:10px 14px;font-size:13px;margin-bottom:10px;font-family:var(--font2);}
+.note-gold{background:rgba(186,117,23,0.15);color:var(--gold);border-left:3px solid var(--gold2);}
+.note-green{background:rgba(29,158,117,0.15);color:var(--green);border-left:3px solid var(--green2);}
+.note-red{background:rgba(216,90,48,0.15);color:var(--coral);border-left:3px solid var(--coral2);}
+.note-purple{background:rgba(127,119,221,0.15);color:var(--acc);border-left:3px solid var(--acc);}
+
+/* ── Log ── */
+.log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border);gap:10px;}
+.log-item:last-child{border-bottom:none;}
+.log-msg{font-size:13px;color:var(--text);font-family:var(--font2);}
+.log-time{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
+
+/* ── Empty state ── */
+.empty{text-align:center;padding:40px 20px;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-text{font-size:15px;font-weight:700;color:var(--text2);}
+.empty-sub{font-size:13px;color:var(--text3);margin-top:4px;font-family:var(--font2);}
+
+/* ── Loading ── */
+.loading{text-align:center;padding:24px;color:var(--text2);font-size:14px;}
+.spinner{width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--acc);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Section title ── */
+.sec-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:16px;letter-spacing:-0.3px;}
+
+/* ── Due badge ── */
+.due-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;letter-spacing:0.04em;}
+.due-soon{background:rgba(216,90,48,0.2);color:var(--coral);}
+.due-normal{background:rgba(127,119,221,0.15);color:var(--acc);}
+.due-done{background:rgba(29,158,117,0.15);color:var(--green);}
+
+/* ── Check circle ── */
+.check-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;}
+.check-circle.checked{background:var(--green2);border-color:var(--green2);}
+
+/* ── Separator ── */
+.sep{height:0.5px;background:var(--border);margin:12px 0;}
+
+/* ── Tab within page ── */
+.inner-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.inner-tabs::-webkit-scrollbar{display:none;}
+.inner-tab{padding:6px 14px;border-radius:100px;border:0.5px solid var(--border2);background:none;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all 0.15s;}
+.inner-tab.active{background:var(--acc2);color:#fff;border-color:transparent;}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="topbar-title">Good evening!</h1>
+      <p>Podar International · Class 4I</p>
+    </div>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll" id="scroll-area">
+
+    <!-- TODAY -->
+    <div class="section active" id="sec-today"></div>
+
+    <!-- TOMORROW -->
+    <div class="section" id="sec-tomorrow"></div>
+
+    <!-- HOMEWORK -->
+    <div class="section" id="sec-homework"></div>
+
+    <!-- UPLOAD -->
+    <div class="section" id="sec-upload">
+      <div class="sec-title">Upload</div>
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchUploadTab('worksheet')">Daily Worksheet</button>
+        <button class="inner-tab" onclick="switchUploadTab('timetable')">New Timetable</button>
+      </div>
+
+      <!-- Worksheet upload -->
+      <div id="upload-worksheet">
+        <div class="card">
+          <div class="card-title">Daily workdone sheet</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:14px;font-family:var(--font2);">Upload the teacher's handwritten worksheet photo. AI reads it and adds homework automatically.</p>
+          <div class="upload-zone" onclick="document.getElementById('ws-file').click()">
+            <div class="upload-icon">📋</div>
+            <p id="ws-label">Tap to upload worksheet photo</p>
+            <small>JPG or PNG from teacher's WhatsApp</small>
+          </div>
+          <input type="file" id="ws-file" accept="image/*" style="display:none" onchange="handleWsFile(this)"/>
+          <img id="preview-img"/>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-gold btn-full" id="ws-extract-btn" style="display:none" onclick="extractWorksheet()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Extract with AI
+            </button>
+          </div>
+          <div id="ws-result"></div>
+        </div>
+      </div>
+
+      <!-- Timetable upload -->
+      <div id="upload-timetable" style="display:none">
+        <div class="card">
+          <div class="card-title">Update timetable</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:14px;font-family:var(--font2);">When school sends a new timetable, upload it here to update the schedule.</p>
+          <div class="upload-zone" onclick="document.getElementById('tt-file').click()">
+            <div class="upload-icon">📅</div>
+            <p id="tt-label">Tap to upload timetable image</p>
+            <small>The printed school timetable</small>
+          </div>
+          <input type="file" id="tt-file" accept="image/*" style="display:none" onchange="handleTtFile(this)"/>
+          <img id="tt-preview" style="width:100%;border-radius:12px;margin-top:12px;max-height:220px;object-fit:contain;display:none;"/>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary btn-full" id="tt-extract-btn" style="display:none" onclick="extractTimetable()">Update Timetable with AI</button>
+          </div>
+          <div id="tt-result"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MORE -->
+    <div class="section" id="sec-more">
+      <div class="sec-title">More</div>
+      <div class="card">
+        <div class="card-title">Add homework manually</div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="add-subj">
+            <option>Eng</option><option>Math</option><option>Hindi</option>
+            <option>EVS</option><option>Marathi</option><option>Computer</option>
+            <option>PE</option><option>Library</option><option>Music/Dance</option>
+            <option>ILP/Activity</option><option>Life Skills</option><option>A/Cr</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Task</label>
+          <input type="text" id="add-task" placeholder="What to do..."/>
+        </div>
+        <div class="form-group">
+          <label>Books needed</label>
+          <input type="text" id="add-books" placeholder="e.g. Eng NB, Eng TB"/>
+        </div>
+        <div class="form-group">
+          <label>Due day</label>
+          <select id="add-due">
+            <option value="Monday">Monday</option><option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option><option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addHWManual()">Add Homework</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Activity log</div>
+        <div id="log-list"></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-title">App info</div>
+        <p style="font-size:13px;color:var(--text2);font-family:var(--font2);line-height:1.6;">Jiana's School Tracker PWA · Class 4I<br>Podar International School, Santacruz West<br>Class Teacher: Archana Dhaygude<br><br>Data saved locally on this device.</p>
+      </div>
+    </div>
+
+  </div><!-- /scroll -->
+
+  <!-- Bottom nav -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchTab('today')" id="nav-today">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Today
+    </button>
+    <button class="nav-btn" onclick="switchTab('tomorrow')" id="nav-tomorrow">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Tomorrow
+    </button>
+    <button class="nav-btn" onclick="switchTab('homework')" id="nav-homework">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      Homework
+    </button>
+    <button class="nav-btn" onclick="switchTab('upload')" id="nav-upload">
+      <svg viewBox="0 0 24 24"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+      Upload
+    </button>
+    <button class="nav-btn" onclick="switchTab('more')" id="nav-more">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      More
+    </button>
+  </nav>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+const DEFAULT_TT = {
+  Monday:    [{p:'1',t:'12:45 – 1:30',s:'EVS',tc:'Archana Dhaygude'},{p:'2',t:'1:30 – 2:15',s:'Eng',tc:'Mehuli Das'},{p:'3',t:'2:15 – 3:00',s:'Computer',tc:'Nilam Salunkhe'},{p:'B',t:'3:00 – 3:20',s:'Break',tc:''},{p:'4',t:'3:20 – 4:05',s:'Hindi',tc:'Vandana Yadav'},{p:'5',t:'4:05 – 4:50',s:'Math',tc:'Meena Nadar'},{p:'6',t:'4:50 – 5:40',s:'Marathi',tc:'Shalaka Parte'}],
+  Tuesday:   [{p:'1',t:'12:45 – 1:30',s:'Eng',tc:'Mehuli Das'},{p:'2–3',t:'1:30 – 3:00',s:'PE',tc:'Nilesh Ghosalkar / Daiwat Rane / Pravin Mohite'},{p:'B',t:'3:00 – 3:20',s:'Break',tc:''},{p:'4',t:'3:20 – 4:05',s:'Hindi',tc:'Vandana Yadav'},{p:'5',t:'4:05 – 4:50',s:'ILP/Activity',tc:'Archana Dhaygude'},{p:'6',t:'4:50 – 5:40',s:'Math Lab',tc:'Meena Nadar'}],
+  Wednesday: [{p:'1',t:'12:45 – 1:30',s:'Library',tc:'Mukta Khobrekar'},{p:'2',t:'1:30 – 2:15',s:'Eng',tc:'Mehuli Das'},{p:'3',t:'2:15 – 3:00',s:'Hindi',tc:'Vandana Yadav'},{p:'B',t:'3:00 – 3:20',s:'Break',tc:''},{p:'4',t:'3:20 – 4:05',s:'Music/Dance',tc:'Dushant Brahmane / Santoshkumar Maklani'},{p:'5',t:'4:05 – 4:50',s:'EVS',tc:'Archana Dhaygude'},{p:'6',t:'4:50 – 5:40',s:'Math',tc:'Meena Nadar'}],
+  Thursday:  [{p:'1',t:'12:45 – 1:30',s:'Marathi',tc:'Shalaka Parte'},{p:'2',t:'1:30 – 2:15',s:'Life Skills',tc:'Mehek Councillor'},{p:'3',t:'2:15 – 3:00',s:'Eng',tc:'Mehuli Das'},{p:'B',t:'3:00 – 3:20',s:'Break',tc:''},{p:'4',t:'3:20 – 4:05',s:'EVS',tc:'Archana Dhaygude'},{p:'5',t:'4:05 – 4:50',s:'Computer',tc:'Nilam Salunkhe'},{p:'6',t:'4:50 – 5:40',s:'Math',tc:'Meena Nadar'}],
+  Friday:    [{p:'1',t:'12:45 – 1:30',s:'Hindi',tc:'Vandana Yadav'},{p:'2–3',t:'1:30 – 3:00',s:'A/Cr',tc:'Trupti Patil'},{p:'B',t:'3:00 – 3:20',s:'Break',tc:''},{p:'4',t:'3:20 – 4:05',s:'Eng',tc:'Mehuli Das'},{p:'5',t:'4:05 – 4:50',s:'Math',tc:'Meena Nadar'},{p:'6',t:'4:50 – 5:40',s:'EVS',tc:'Archana Dhaygude'}],
+};
+
+const ALWAYS_BOOKS = {
+  Eng:['Eng NB','Eng TB'], 'Math':['Math NB','Math TB'], 'Math Lab':['Math NB','Math TB'],
+  Hindi:['Hindi NB','Hindi TB'], EVS:['EVS NB','EVS TB'],
+  Marathi:['Marathi NB','Marathi TB'], Computer:['Comp NB','Comp TB'],
+};
+
+const SUBJ_CLS = {
+  Math:'s-math','Math Lab':'s-math',Eng:'s-eng',Hindi:'s-hindi',
+  EVS:'s-evs',Marathi:'s-marathi',Computer:'s-comp',
+  PE:'s-other',Library:'s-other','Music/Dance':'s-other',
+  'ILP/Activity':'s-other','Life Skills':'s-other','A/Cr':'s-other',
+};
+
+function loadState() {
+  try { const s = localStorage.getItem('jiana-pwa-v1'); if(s) return JSON.parse(s); } catch(e){}
+  return {
+    nextId:50,
+    timetable: DEFAULT_TT,
+    ttUpdated:'11-04-2026',
+    homework:[
+      {id:1,subj:'Marathi',task:'Read poem, draw & colour tree picture',books:['Marathi NB','Marathi TB'],dueDay:'Monday',done:false,addedDate:'10/4'},
+      {id:2,subj:'Eng',task:'Learn types of nouns',books:['Eng NB','Eng TB'],dueDay:'Wednesday',done:false,addedDate:'10/4'},
+      {id:3,subj:'Hindi',task:'Pg 5 exercise',books:['Hindi TB','Hindi NB'],dueDay:'Tuesday',done:false,addedDate:'10/4'},
+      {id:4,subj:'Math',task:'Complete worksheet – Ex 1–5 Q.1, Session No.7',books:['Math TB','Math NB'],dueDay:'Monday',done:false,addedDate:'10/4'},
+      {id:5,subj:'EVS',task:'Q.4(b) in NB, Read pg 4',books:['EVS TB','EVS NB'],dueDay:'Monday',done:false,addedDate:'10/4'},
+      {id:6,subj:'Computer',task:'Read chapter, Practise Bold / Italic / Underline',books:['Comp TB','Comp NB'],dueDay:'Thursday',done:false,addedDate:'10/4'},
+    ],
+    log:[]
+  };
+}
+
+let S = loadState();
+function save() { try{ localStorage.setItem('jiana-pwa-v1',JSON.stringify(S)); }catch(e){} }
+function nid() { return S.nextId++; }
+
+function addLog(msg) {
+  const now = new Date();
+  const t = now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  S.log.unshift({msg,t});
+  if(S.log.length>80) S.log=S.log.slice(0,80);
+  save();
+}
+
+// ── Navigation ────────────────────────────────────────────────
+let currentTab = 'today';
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  document.getElementById('scroll-area').scrollTop = 0;
+  currentTab = tab;
+  const titles = {today:'Good evening!',tomorrow:'Tomorrow',homework:'Homework',upload:'Upload',more:'More'};
+  document.getElementById('topbar-title').textContent = titles[tab]||'';
+  if(tab==='today') renderToday();
+  else if(tab==='tomorrow') renderTomorrow();
+  else if(tab==='homework') renderHomework();
+  else if(tab==='more') renderMore();
+}
+
+function switchUploadTab(t) {
+  document.querySelectorAll('.inner-tab').forEach((b,i)=>b.classList.toggle('active',['worksheet','timetable'][i]===t));
+  document.getElementById('upload-worksheet').style.display = t==='worksheet'?'block':'none';
+  document.getElementById('upload-timetable').style.display = t==='timetable'?'block':'none';
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function todayName() { return DAYS[new Date().getDay()]; }
+function tomorrowName() { return DAYS[(new Date().getDay()+1)%7]; }
+function todayDate() { return new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'}); }
+
+function sbadge(subj) {
+  const cls = SUBJ_CLS[subj]||'s-other';
+  return `<span class="sbadge ${cls}">${subj}</span>`;
+}
+
+function getBooksForDay(dayName) {
+  const periods = S.timetable[dayName]||[];
+  const subjects = periods.filter(p=>p.s!=='Break').map(p=>p.s);
+  const books = new Set();
+  subjects.forEach(s=>{ (ALWAYS_BOOKS[s]||[]).forEach(b=>books.add(b)); });
+  S.homework.filter(h=>!h.done && subjects.includes(h.subj)).forEach(h=>h.books.forEach(b=>books.add(b)));
+  return [...books];
+}
+
+function getHWForDay(dayName) {
+  const prevMap = {Monday:['Friday','Saturday'],Tuesday:['Monday'],Wednesday:['Tuesday'],Thursday:['Wednesday'],Friday:['Thursday']};
+  const prev = prevMap[dayName]||[];
+  return S.homework.filter(h=>!h.done && (h.dueDay===dayName || prev.includes(h.dueDay)));
+}
+
+
+// ── Today ─────────────────────────────────────────────────────
+function renderToday() {
+  const day = todayName();
+  const tt = S.timetable[day];
+  const hw = getHWForDay(day);
+  const books = getBooksForDay(tomorrowName());
+  let h = '';
+
+  h += `<div class="day-banner">
+    <div class="day-banner-day">${day}</div>
+    <div class="day-banner-date">${todayDate()}</div>
+    <div class="day-banner-sub">${S.homework.filter(x=>!x.done).length} homework pending</div>
+  </div>`;
+
+  // Books for tomorrow
+  h += `<div class="card"><div class="card-title">Pack for tomorrow</div>`;
+  if(books.length) {
+    h += `<div class="books-strip">${books.map(b=>`<div class="book-pill">${b}</div>`).join('')}</div>`;
+  } else {
+    h += `<p style="font-size:13px;color:var(--text2);font-family:var(--font2);">Upload today's worksheet to see books needed.</p>`;
+  }
+  h += `</div>`;
+
+  // HW due
+  if(hw.length) {
+    h += `<div class="card"><div class="card-title">Homework to complete</div>`;
+    hw.forEach(item => {
+      h += hwCardHTML(item);
+    });
+    h += `</div>`;
+  }
+
+  // Today's schedule
+  if(!tt) {
+    h += `<div class="card"><div class="empty"><div class="empty-icon">🎉</div><div class="empty-text">No school today!</div></div></div>`;
+  } else {
+    h += `<div class="card"><div class="card-title">Today's schedule</div><div class="sched-list">`;
+    tt.forEach(p => { h += schedRowHTML(p); });
+    h += `</div></div>`;
+  }
+
+  document.getElementById('sec-today').innerHTML = h;
+}
+
+// ── Tomorrow ──────────────────────────────────────────────────
+function renderTomorrow() {
+  const day = tomorrowName();
+  const tt = S.timetable[day];
+  const books = getBooksForDay(day);
+  const hwDue = S.homework.filter(h=>!h.done && h.dueDay===day);
+  let h = '';
+
+  h += `<div class="day-banner">
+    <div class="day-banner-day">${day}</div>
+    <div class="day-banner-sub">Next school day</div>
+  </div>`;
+
+  h += `<div class="card"><div class="card-title">Books to carry</div>`;
+  if(books.length) {
+    h += `<div class="books-strip">${books.map(b=>`<div class="book-pill">${b}</div>`).join('')}</div>`;
+  } else {
+    h += `<p style="font-size:13px;color:var(--text2);font-family:var(--font2);">No specific books noted.</p>`;
+  }
+  h += `</div>`;
+
+  if(hwDue.length) {
+    h += `<div class="card"><div class="card-title">Due tomorrow</div>`;
+    hwDue.forEach(item => { h += hwCardHTML(item); });
+    h += `</div>`;
+  }
+
+  if(!tt) {
+    h += `<div class="card"><div class="empty"><div class="empty-icon">😴</div><div class="empty-text">Weekend — no school!</div></div></div>`;
+  } else {
+    h += `<div class="card"><div class="card-title">Schedule</div><div class="sched-list">`;
+    tt.forEach(p => { h += schedRowHTML(p); });
+    h += `</div></div>`;
+  }
+
+  document.getElementById('sec-tomorrow').innerHTML = h;
+}
+
+function schedRowHTML(p) {
+  if(p.s === 'Break') {
+    return `<div class="sched-item break-item">
+      <div class="sched-time-col"><div class="sched-period">BREAK</div><div class="sched-time">${p.t}</div></div>
+      <div class="break-dot"></div><div class="break-label">Break time</div>
+    </div>`;
+  }
+  return `<div class="sched-item">
+    <div class="sched-time-col">
+      <div class="sched-period">Period ${p.p}</div>
+      <div class="sched-time">${p.t}</div>
+    </div>
+    <div class="sched-content">
+      <div class="sched-subj">${sbadge(p.s)}</div>
+      <div class="sched-teacher">${p.tc||''}</div>
+    </div>
+  </div>`;
+}
+
+function hwCardHTML(item) {
+  const isDone = item.done;
+  return `<div class="hw-card ${isDone?'done':''}" id="hwc-${item.id}">
+    <div class="hw-top">
+      <div>${sbadge(item.subj)}</div>
+      <button class="check-circle ${isDone?'checked':''}" onclick="toggleHW(${item.id})">${isDone?'✓':''}</button>
+    </div>
+    <div class="hw-task ${isDone?'done-text':''}">${item.task}</div>
+    <div class="hw-meta">Due ${item.dueDay} · Added ${item.addedDate}</div>
+    ${item.books && item.books.length ? `<div class="hw-books">${item.books.map(b=>`<span class="hw-book">${b}</span>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+// ── Homework ──────────────────────────────────────────────────
+function renderHomework() {
+  const pending = S.homework.filter(h=>!h.done);
+  const done = S.homework.filter(h=>h.done);
+  let h = `<div class="metrics" style="grid-template-columns:1fr 1fr;">
+    <div class="metric"><div class="metric-val">${pending.length}</div><div class="metric-lbl">Pending</div></div>
+    <div class="metric"><div class="metric-val">${done.length}</div><div class="metric-lbl">Done</div></div>
+  </div>`;
+
+  if(!pending.length && !done.length) {
+    h += `<div class="empty"><div class="empty-icon">📚</div><div class="empty-text">No homework yet</div><div class="empty-sub">Upload a worksheet or add homework manually in More</div></div>`;
+  } else {
+    if(pending.length) {
+      h += `<div class="card"><div class="card-title">Pending (${pending.length})</div>`;
+      pending.forEach(item => { h += hwCardHTML(item); });
+      h += `</div>`;
+    }
+    if(done.length) {
+      h += `<div class="card"><div class="card-title" style="color:var(--text3);">Completed (${done.length})</div>`;
+      done.forEach(item => { h += hwCardHTML(item); });
+      h += `</div>`;
+    }
+  }
+  document.getElementById('sec-homework').innerHTML = h;
+}
+
+function toggleHW(id) {
+  const h = S.homework.find(x=>x.id===id);
+  if(!h) return;
+  h.done = !h.done;
+  if(h.done) { addLog('Done: '+h.subj+' – '+h.task); }
+  save();
+  if(currentTab==='today') renderToday();
+  else if(currentTab==='tomorrow') renderTomorrow();
+  else if(currentTab==='homework') renderHomework();
+}
+
+function addHWManual() {
+  const subj = document.getElementById('add-subj').value;
+  const task = document.getElementById('add-task').value.trim();
+  const books = document.getElementById('add-books').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+  const dueDay = document.getElementById('add-due').value;
+  if(!task) return;
+  const now = new Date();
+  const addedDate = now.getDate()+'/'+(now.getMonth()+1);
+  S.homework.push({id:nid(),subj,task,books,dueDay,done:false,addedDate});
+  addLog('HW added: '+subj+' – '+task);
+  save();
+  document.getElementById('add-task').value='';
+  document.getElementById('add-books').value='';
+  renderMore();
+  alert('Homework added!');
+}
+
+// ── More ──────────────────────────────────────────────────────
+function renderMore() {
+  const logEl = document.getElementById('log-list');
+  if(logEl) {
+    logEl.innerHTML = S.log.length
+      ? S.log.map(l=>`<div class="log-item"><span class="log-msg">${l.msg}</span><span class="log-time">${l.t}</span></div>`).join('')
+      : '<div class="empty-sub" style="text-align:center;padding:16px;">No activity yet</div>';
+  }
+}
+
+// ── AI Worksheet Extract ──────────────────────────────────────
+let wsB64 = null, ttB64 = null;
+
+function handleWsFile(input) {
+  const file = input.files[0]; if(!file) return;
+  document.getElementById('ws-label').textContent = file.name;
+  const r = new FileReader();
+  r.onload = e => {
+    wsB64 = e.target.result.split(',')[1];
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-img').style.display='block';
+    document.getElementById('ws-extract-btn').style.display='flex';
+  };
+  r.readAsDataURL(file);
+}
+
+async function extractWorksheet() {
+  const btn = document.getElementById('ws-extract-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner" style="width:18px;height:18px;margin:0;"></div> Extracting…';
+  document.getElementById('ws-result').innerHTML='<div class="loading"><div class="spinner"></div>Reading handwriting with AI…</div>';
+  const day = todayName();
+  const tt = S.timetable[day]||[];
+  const subjects = tt.filter(p=>p.s!=='Break').map(p=>p.s).join(', ');
+  const dateStr = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1500,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:wsB64}},
+          {type:'text',text:`Daily workdone sheet from Jiana's school (Class 4I, grade 4, age ~9, Mumbai). Today: ${dateStr}. Today's subjects: ${subjects}.
+Return ONLY valid JSON, no markdown:
+{"date":"DD/MM","homework":[{"subject":"...","task":"...","books":["Eng NB","Eng TB"],"dueDay":"Monday"}],"notes":"...","classWork":[{"subject":"...","done":"..."}]}
+Rules: subject = one of: Eng,Math,Hindi,EVS,Marathi,Computer,PE,Library,Music/Dance,ILP/Activity,Life Skills,A/Cr. books format: "Eng NB","Math TB" etc. dueDay = next school day after when given. If Friday→Monday.`}
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(i=>i.text||'').join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const dateAdded = parsed.date||new Date().getDate()+'/'+(new Date().getMonth()+1);
+    parsed.homework.forEach(h=>{
+      S.homework.push({id:nid(),subj:h.subject,task:h.task,books:h.books||[],dueDay:h.dueDay||'Monday',done:false,addedDate:dateAdded});
+    });
+    addLog('Worksheet uploaded ('+dateAdded+'): '+parsed.homework.length+' homework items added');
+    save();
+    let res = `<div class="note-green" style="margin-top:12px;">Extracted from worksheet (${dateAdded})</div>`;
+    if(parsed.homework.length) {
+      res += `<div style="margin-top:10px;">`;
+      parsed.homework.forEach(h=>{ res+=`<div class="hw-card" style="margin-bottom:8px;">${sbadge(h.subject)} <span style="font-size:13px;color:var(--text);margin-left:4px;">${h.task}</span><div class="hw-meta" style="margin-top:4px;">Due ${h.dueDay}</div></div>`; });
+      res += `</div>`;
+    }
+    if(parsed.notes) res+=`<div class="note-gold" style="margin-top:8px;">${parsed.notes}</div>`;
+    document.getElementById('ws-result').innerHTML = res;
+  } catch(err) {
+    document.getElementById('ws-result').innerHTML=`<div class="note-red" style="margin-top:12px;">Could not extract: ${err.message}</div>`;
+  }
+  btn.disabled=false; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Extract with AI';
+}
+
+function handleTtFile(input) {
+  const file = input.files[0]; if(!file) return;
+  document.getElementById('tt-label').textContent = file.name;
+  const r = new FileReader();
+  r.onload = e => {
+    ttB64 = e.target.result.split(',')[1];
+    document.getElementById('tt-preview').src = e.target.result;
+    document.getElementById('tt-preview').style.display='block';
+    document.getElementById('tt-extract-btn').style.display='block';
+  };
+  r.readAsDataURL(file);
+}
+
+async function extractTimetable() {
+  const btn = document.getElementById('tt-extract-btn');
+  btn.disabled=true; btn.textContent='Updating…';
+  document.getElementById('tt-result').innerHTML='<div class="loading"><div class="spinner"></div>Reading new timetable…</div>';
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:2000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:ttB64}},
+          {type:'text',text:`School timetable for Jiana's class. Extract full weekly schedule.
+Return ONLY valid JSON no markdown:
+{"updated":"DD-MM-YYYY","timetable":{"Monday":[{"p":"1","t":"12:45 – 1:30","s":"EVS","tc":"Teacher Name"},{"p":"B","t":"3:00 – 3:20","s":"Break","tc":""}],"Tuesday":[...],...}}
+Rules: s=subject short name (Eng/Math/Hindi/EVS/Marathi/Computer/PE/Library/Music/Dance/ILP/Activity/Life Skills/A/Cr/Break). p=period number string. t=time range "HH:MM – HH:MM". tc=teacher name.`}
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(i=>i.text||'').join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    S.timetable = parsed.timetable; S.ttUpdated = parsed.updated||'updated';
+    addLog('Timetable updated: '+S.ttUpdated);
+    save();
+    document.getElementById('tt-result').innerHTML=`<div class="note-green" style="margin-top:12px;">Timetable updated for ${S.ttUpdated}!</div>`;
+  } catch(err) {
+    document.getElementById('tt-result').innerHTML=`<div class="note-red" style="margin-top:12px;">Error: ${err.message}</div>`;
+  }
+  btn.disabled=false; btn.textContent='Update Timetable with AI';
+}
+
+// ── Init ──────────────────────────────────────────────────────
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+const hour = new Date().getHours();
+const greet = hour < 12 ? 'Good morning!' : hour < 17 ? 'Good afternoon!' : 'Good evening!';
+document.getElementById('topbar-title').textContent = greet;
+
+renderToday();
+</script>
+</body>
+</html>
