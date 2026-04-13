@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="theme-color" content="#0f0e17"/>
+<meta name="theme-color" content="#f5f4f0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="Jiana"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icons/icon-192.png"/>
@@ -13,15 +13,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg0:#0f0e17; --bg1:#1a1927; --bg2:#22213a; --bg3:#2a2945;
-  --acc:#7f77dd; --acc2:#534ab7; --acc3:#3c3489;
-  --gold:#fac775; --gold2:#ef9f27; --gold3:#ba7517;
-  --green:#5dcaa5; --green2:#1d9e75; --green3:#085041;
-  --coral:#f0997b; --coral2:#d85a30; --coral3:#993c1d;
-  --pink:#ed93b1; --pink2:#d4537e; --pink3:#72243e;
-  --teal:#9fe1cb; --teal2:#1d9e75;
-  --text:#f0efeb; --text2:#a0a09a; --text3:#686864;
-  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14);
+  --bg0:#f5f4f0; --bg1:#ffffff; --bg2:#eeecea; --bg3:#e4e2de;
+  --acc:#534ab7; --acc2:#3c3489; --acc3:#26215c;
+  --gold:#ba7517; --gold2:#ef9f27; --gold3:#fac775;
+  --green:#0f6e56; --green2:#1d9e75; --green3:#5dcaa5;
+  --coral:#993c1d; --coral2:#d85a30; --coral3:#f0997b;
+  --pink:#72243e; --pink2:#d4537e; --pink3:#ed93b1;
+  --teal:#085041; --teal2:#1d9e75;
+  --text:#1a1918; --text2:#5a5955; --text3:#9a9994;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
   --r:16px; --r2:12px; --r3:8px;
   --font:'Nunito',sans-serif; --font2:'Nunito Sans',sans-serif;
   --safe-top: env(safe-area-inset-top,0px);
@@ -86,13 +86,13 @@ body{font-family:var(--font);color:var(--text);display:flex;flex-direction:colum
 
 /* ── Subject badges ── */
 .sbadge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:0.01em;}
-.s-math   {background:rgba(55,138,221,0.15);color:#85b7eb;}
-.s-eng    {background:rgba(99,153,34,0.15);color:#97c459;}
-.s-hindi  {background:rgba(186,117,23,0.15);color:#fac775;}
-.s-evs    {background:rgba(29,158,117,0.15);color:#9fe1cb;}
-.s-marathi{background:rgba(212,83,126,0.15);color:#ed93b1;}
-.s-comp   {background:rgba(127,119,221,0.15);color:#afa9ec;}
-.s-other  {background:rgba(136,135,128,0.15);color:#b4b2a9;}
+.s-math   {background:#E6F1FB;color:#0C447C;}
+.s-eng    {background:#EAF3DE;color:#27500A;}
+.s-hindi  {background:#FAEEDA;color:#633806;}
+.s-evs    {background:#E1F5EE;color:#085041;}
+.s-marathi{background:#FBEAF0;color:#72243E;}
+.s-comp   {background:#EEEDFE;color:#3C3489;}
+.s-other  {background:#F1EFE8;color:#444441;}
 
 /* ── HW items ── */
 .hw-card{background:var(--bg2);border-radius:var(--r2);padding:14px;margin-bottom:8px;border-left:3px solid var(--acc);}
@@ -109,9 +109,9 @@ body{font-family:var(--font);color:var(--text);display:flex;flex-direction:colum
 .btn{padding:9px 16px;border-radius:var(--r3);border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
 .btn:active{transform:scale(0.96);}
 .btn-primary{background:var(--acc2);color:#fff;}
-.btn-green{background:rgba(29,158,117,0.2);color:var(--green);}
+.btn-green{background:#EAF3DE;color:#27500A;}
 .btn-ghost{background:var(--bg3);color:var(--text2);}
-.btn-danger{background:rgba(216,90,48,0.15);color:var(--coral);}
+.btn-danger{background:#FCEBEB;color:#791F1F;}
 .btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold2));color:#1a0a00;box-shadow:0 2px 12px rgba(239,159,39,0.3);}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .btn-full{width:100%;justify-content:center;}
@@ -144,10 +144,10 @@ label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bot
 
 /* ── Notes/alerts ── */
 .note{border-radius:var(--r3);padding:10px 14px;font-size:13px;margin-bottom:10px;font-family:var(--font2);}
-.note-gold{background:rgba(186,117,23,0.15);color:var(--gold);border-left:3px solid var(--gold2);}
-.note-green{background:rgba(29,158,117,0.15);color:var(--green);border-left:3px solid var(--green2);}
-.note-red{background:rgba(216,90,48,0.15);color:var(--coral);border-left:3px solid var(--coral2);}
-.note-purple{background:rgba(127,119,221,0.15);color:var(--acc);border-left:3px solid var(--acc);}
+.note-gold{background:#FAEEDA;color:#633806;border-left:3px solid var(--gold2);}
+.note-green{background:#EAF3DE;color:#27500A;border-left:3px solid var(--green2);}
+.note-red{background:#FCEBEB;color:#791F1F;border-left:3px solid var(--coral2);}
+.note-purple{background:#EEEDFE;color:#3C3489;border-left:3px solid var(--acc);}
 
 /* ── Log ── */
 .log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border);gap:10px;}
@@ -171,9 +171,9 @@ label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bot
 
 /* ── Due badge ── */
 .due-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;letter-spacing:0.04em;}
-.due-soon{background:rgba(216,90,48,0.2);color:var(--coral);}
-.due-normal{background:rgba(127,119,221,0.15);color:var(--acc);}
-.due-done{background:rgba(29,158,117,0.15);color:var(--green);}
+.due-soon{background:#FCEBEB;color:#791F1F;}
+.due-normal{background:#EEEDFE;color:#3C3489;}
+.due-done{background:#EAF3DE;color:#27500A;}
 
 /* ── Check circle ── */
 .check-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;}
