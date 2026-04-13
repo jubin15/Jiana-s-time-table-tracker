@@ -378,6 +378,9 @@ let S = loadState();
 function save() { try{ localStorage.setItem('jiana-pwa-v1',JSON.stringify(S)); }catch(e){} }
 function nid() { return S.nextId++; }
 
+// ── API proxy URL — update this after deploying Cloudflare Worker ──
+const API_URL = 'https://jiana-proxy.YOUR-SUBDOMAIN.workers.dev';
+
 function addLog(msg) {
   const now = new Date();
   const t = now.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
@@ -638,7 +641,7 @@ async function extractWorksheet() {
   const subjects = tt.filter(p=>p.s!=='Break').map(p=>p.s).join(', ');
   const dateStr = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    const resp = await fetch(API_URL,{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1500,
@@ -692,7 +695,7 @@ async function extractTimetable() {
   btn.disabled=true; btn.textContent='Updating…';
   document.getElementById('tt-result').innerHTML='<div class="loading"><div class="spinner"></div>Reading new timetable…</div>';
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+    const resp = await fetch(API_URL,{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:2000,
