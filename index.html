@@ -655,6 +655,7 @@ Rules: subject = one of: Eng,Math,Hindi,EVS,Marathi,Computer,PE,Library,Music/Da
       })
     });
     const data = await resp.json();
+    if (!data.content) throw new Error('API said: ' + (data.error ? data.error.message : JSON.stringify(data)));
     const text = data.content.map(i=>i.text||'').join('');
     const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     const dateAdded = parsed.date||new Date().getDate()+'/'+(new Date().getMonth()+1);
@@ -709,6 +710,7 @@ Rules: s=subject short name (Eng/Math/Hindi/EVS/Marathi/Computer/PE/Library/Musi
       })
     });
     const data = await resp.json();
+    if (!data.content) throw new Error('API said: ' + (data.error ? data.error.message : JSON.stringify(data)));
     const text = data.content.map(i=>i.text||'').join('');
     const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     S.timetable = parsed.timetable; S.ttUpdated = parsed.updated||'updated';
