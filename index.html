@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="theme-color" content="#f5f4f0"/>
+<meta name="theme-color" content="#6b3fa0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="Jiana"/>
@@ -13,15 +13,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg0:#f5f4f0; --bg1:#ffffff; --bg2:#eeecea; --bg3:#e4e2de;
-  --acc:#534ab7; --acc2:#3c3489; --acc3:#26215c;
-  --gold:#ba7517; --gold2:#ef9f27; --gold3:#fac775;
-  --green:#0f6e56; --green2:#1d9e75; --green3:#5dcaa5;
-  --coral:#993c1d; --coral2:#d85a30; --coral3:#f0997b;
-  --pink:#72243e; --pink2:#d4537e; --pink3:#ed93b1;
-  --teal:#085041; --teal2:#1d9e75;
-  --text:#1a1918; --text2:#5a5955; --text3:#9a9994;
-  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.14);
+  --bg0:#f5f2fa; --bg1:#ffffff; --bg2:#ede8f5; --bg3:#e2daf0;
+  --acc:#6b3fa0; --acc2:#5a3388; --acc3:#3d2260;
+  --gold:#1a4b8c; --gold2:#1a4b8c; --gold3:#0e3166;
+  --green:#2d6a4f; --green2:#40916c; --green3:#74c69d;
+  --coral:#c0392b; --coral2:#e74c3c; --coral3:#f1948a;
+  --pink:#6b3fa0; --pink2:#8e5cbf; --pink3:#c3a8e0;
+  --teal:#1a4b8c; --teal2:#2563b0;
+  --text:#1a0d2e; --text2:#5a4a72; --text3:#a090bc;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15);
   --r:16px; --r2:12px; --r3:8px;
   --font:'Nunito',sans-serif; --font2:'Nunito Sans',sans-serif;
   --safe-top: env(safe-area-inset-top,0px);
@@ -86,13 +86,13 @@ body{font-family:var(--font);color:var(--text);display:flex;flex-direction:colum
 
 /* ── Subject badges ── */
 .sbadge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:0.01em;}
-.s-math   {background:#E6F1FB;color:#0C447C;}
-.s-eng    {background:#EAF3DE;color:#27500A;}
-.s-hindi  {background:#FAEEDA;color:#633806;}
-.s-evs    {background:#E1F5EE;color:#085041;}
-.s-marathi{background:#FBEAF0;color:#72243E;}
-.s-comp   {background:#EEEDFE;color:#3C3489;}
-.s-other  {background:#F1EFE8;color:#444441;}
+.s-math   {background:#dce8f8;color:#0e3166;}
+.s-eng    {background:#e8f5e9;color:#1b5e20;}
+.s-hindi  {background:#f0ebfa;color:#3d2260;}
+.s-evs    {background:#e0f2f1;color:#00514a;}
+.s-marathi{background:#ede8f5;color:#3d2260;}
+.s-comp   {background:#e8edfb;color:#1a3a6b;}
+.s-other  {background:#ece8f5;color:#5a4a72;}
 
 /* ── HW items ── */
 .hw-card{background:var(--bg2);border-radius:var(--r2);padding:14px;margin-bottom:8px;border-left:3px solid var(--acc);}
@@ -109,9 +109,9 @@ body{font-family:var(--font);color:var(--text);display:flex;flex-direction:colum
 .btn{padding:9px 16px;border-radius:var(--r3);border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px;}
 .btn:active{transform:scale(0.96);}
 .btn-primary{background:var(--acc2);color:#fff;}
-.btn-green{background:#EAF3DE;color:#27500A;}
+.btn-green{background:#edf7f0;color:#1b5e20;}
 .btn-ghost{background:var(--bg3);color:var(--text2);}
-.btn-danger{background:#FCEBEB;color:#791F1F;}
+.btn-danger{background:#fdecea;color:#7d181c;}
 .btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold2));color:#1a0a00;box-shadow:0 2px 12px rgba(239,159,39,0.3);}
 .btn-sm{padding:6px 12px;font-size:12px;}
 .btn-full{width:100%;justify-content:center;}
@@ -144,10 +144,10 @@ label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bot
 
 /* ── Notes/alerts ── */
 .note{border-radius:var(--r3);padding:10px 14px;font-size:13px;margin-bottom:10px;font-family:var(--font2);}
-.note-gold{background:#FAEEDA;color:#633806;border-left:3px solid var(--gold2);}
-.note-green{background:#EAF3DE;color:#27500A;border-left:3px solid var(--green2);}
-.note-red{background:#FCEBEB;color:#791F1F;border-left:3px solid var(--coral2);}
-.note-purple{background:#EEEDFE;color:#3C3489;border-left:3px solid var(--acc);}
+.note-gold{background:#e8edfb;color:#0e3166;border-left:3px solid #1a4b8c;}
+.note-green{background:#edf7f0;color:#1b5e20;border-left:3px solid var(--green2);}
+.note-red{background:#fdecea;color:#7d181c;border-left:3px solid #c0392b;}
+.note-purple{background:#f0ebfa;color:#3d2260;border-left:3px solid var(--acc);}
 
 /* ── Log ── */
 .log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border);gap:10px;}
@@ -171,9 +171,9 @@ label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bot
 
 /* ── Due badge ── */
 .due-badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;letter-spacing:0.04em;}
-.due-soon{background:#FCEBEB;color:#791F1F;}
-.due-normal{background:#EEEDFE;color:#3C3489;}
-.due-done{background:#EAF3DE;color:#27500A;}
+.due-soon{background:#fdecea;color:#7d181c;}
+.due-normal{background:#f0ebfa;color:#3d2260;}
+.due-done{background:#edf7f0;color:#1b5e20;}
 
 /* ── Check circle ── */
 .check-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;}
@@ -239,6 +239,46 @@ label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bot
           </div>
           <div id="ws-result"></div>
         </div>
+      </div>
+
+      <!-- Manual entry card -->
+      <div class="card" id="manual-entry-card">
+        <div class="card-title">Add homework manually</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;font-family:var(--font2);">Use this to enter Hindi or Marathi homework the AI couldn't read, or any other homework.</p>
+        <div class="form-group">
+          <label>Subject</label>
+          <select id="m-subj">
+            <option>Hindi</option>
+            <option>Marathi</option>
+            <option>Eng</option>
+            <option>Math</option>
+            <option>EVS</option>
+            <option>Computer</option>
+            <option>PE</option>
+            <option>Library</option>
+            <option>Music/Dance</option>
+            <option>ILP/Activity</option>
+            <option>Life Skills</option>
+            <option>A/Cr</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Homework task</label>
+          <input type="text" id="m-task" placeholder="Type homework here... (any language)"/>
+        </div>
+        <div class="form-group">
+          <label>Books needed</label>
+          <input type="text" id="m-books" placeholder="e.g. Hindi NB, Hindi TB"/>
+        </div>
+        <div class="form-group">
+          <label>Due day</label>
+          <select id="m-due">
+            <option>Monday</option><option>Tuesday</option>
+            <option>Wednesday</option><option>Thursday</option><option>Friday</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addManualHW()">Add Homework</button>
+        <div id="manual-result"></div>
       </div>
 
       <!-- Timetable upload -->
@@ -648,9 +688,17 @@ async function extractWorksheet() {
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:'image/jpeg',data:wsB64}},
           {type:'text',text:`Daily workdone sheet from Jiana's school (Class 4I, grade 4, age ~9, Mumbai). Today: ${dateStr}. Today's subjects: ${subjects}.
+
 Return ONLY valid JSON, no markdown:
-{"date":"DD/MM","homework":[{"subject":"...","task":"...","books":["Eng NB","Eng TB"],"dueDay":"Monday"}],"notes":"...","classWork":[{"subject":"...","done":"..."}]}
-Rules: subject = one of: Eng,Math,Hindi,EVS,Marathi,Computer,PE,Library,Music/Dance,ILP/Activity,Life Skills,A/Cr. books format: "Eng NB","Math TB" etc. dueDay = next school day after when given. If Friday→Monday.`}
+{"date":"DD/MM","homework":[{"subject":"...","task":"...","books":["Eng NB","Eng TB"],"dueDay":"Monday","needsReview":false}],"notes":"...","classWork":[{"subject":"...","done":"..."}]}
+
+Rules:
+- subject = one of: Eng, Math, Hindi, EVS, Marathi, Computer, PE, Library, Music/Dance, ILP/Activity, Life Skills, A/Cr
+- books format: "Eng NB", "Math TB" etc. NB=Notebook TB=Textbook
+- dueDay = next school day. If Friday→Monday, Monday→Tuesday etc.
+- For Hindi and Marathi subjects: handwriting may be in Devanagari script. Extract whatever you can read. If you cannot read it confidently, set task to "⚠ Check manually — handwriting unclear" and set needsReview=true. Still include the entry.
+- For all other subjects: extract normally, set needsReview=false.
+- Always include ALL subjects that have homework written, even if you can only partially read them.`}
         ]}]
       })
     });
@@ -660,14 +708,21 @@ Rules: subject = one of: Eng,Math,Hindi,EVS,Marathi,Computer,PE,Library,Music/Da
     const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     const dateAdded = parsed.date||new Date().getDate()+'/'+(new Date().getMonth()+1);
     parsed.homework.forEach(h=>{
-      S.homework.push({id:nid(),subj:h.subject,task:h.task,books:h.books||[],dueDay:h.dueDay||'Monday',done:false,addedDate:dateAdded});
+      S.homework.push({id:nid(),subj:h.subject,task:h.task,books:h.books||[],dueDay:h.dueDay||'Monday',done:false,addedDate:dateAdded,needsReview:h.needsReview||false});
     });
     addLog('Worksheet uploaded ('+dateAdded+'): '+parsed.homework.length+' homework items added');
     save();
     let res = `<div class="note-green" style="margin-top:12px;">Extracted from worksheet (${dateAdded})</div>`;
-    if(parsed.homework.length) {
+    const needsReview = parsed.homework.filter(h=>h.needsReview);
+    const extracted = parsed.homework.filter(h=>!h.needsReview);
+    if(extracted.length) {
       res += `<div style="margin-top:10px;">`;
-      parsed.homework.forEach(h=>{ res+=`<div class="hw-card" style="margin-bottom:8px;">${sbadge(h.subject)} <span style="font-size:13px;color:var(--text);margin-left:4px;">${h.task}</span><div class="hw-meta" style="margin-top:4px;">Due ${h.dueDay}</div></div>`; });
+      extracted.forEach(h=>{ res+=`<div class="hw-card" style="margin-bottom:8px;">${sbadge(h.subject)} <span style="font-size:13px;color:var(--text);margin-left:4px;">${h.task}</span><div class="hw-meta" style="margin-top:4px;">Due ${h.dueDay}</div></div>`; });
+      res += `</div>`;
+    }
+    if(needsReview.length) {
+      res += `<div class="note-gold" style="margin-top:10px;padding:12px;"><div style="font-weight:700;margin-bottom:8px;">⚠ Check manually — handwriting unclear:</div>`;
+      needsReview.forEach(h=>{ res+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">${sbadge(h.subject)}<span style="font-size:13px;">Homework noted but could not be read — please check the sheet</span></div>`; });
       res += `</div>`;
     }
     if(parsed.notes) res+=`<div class="note-gold" style="margin-top:8px;">${parsed.notes}</div>`;
@@ -678,7 +733,24 @@ Rules: subject = one of: Eng,Math,Hindi,EVS,Marathi,Computer,PE,Library,Music/Da
   btn.disabled=false; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Extract with AI';
 }
 
-function handleTtFile(input) {
+function addManualHW() {
+  const subj  = document.getElementById('m-subj').value;
+  const task  = document.getElementById('m-task').value.trim();
+  const books = document.getElementById('m-books').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+  const due   = document.getElementById('m-due').value;
+  if (!task) { document.getElementById('manual-result').innerHTML='<div class="note-red" style="margin-top:8px;">Please enter the homework task.</div>'; return; }
+  const now = new Date();
+  const addedDate = now.getDate()+'/'+(now.getMonth()+1);
+  S.homework.push({id:nid(),subj,task,books,dueDay:due,done:false,addedDate,needsReview:false});
+  addLog('Manual HW added: '+subj+' – '+task);
+  save();
+  document.getElementById('m-task').value='';
+  document.getElementById('m-books').value='';
+  document.getElementById('manual-result').innerHTML='<div class="note-green" style="margin-top:8px;">Added: '+subj+' homework for '+due+'</div>';
+  setTimeout(()=>{ const el=document.getElementById('manual-result'); if(el) el.innerHTML=''; },3000);
+}
+
+
   const file = input.files[0]; if(!file) return;
   document.getElementById('tt-label').textContent = file.name;
   const r = new FileReader();
