@@ -503,30 +503,19 @@ function renderToday() {
     <div class="day-banner-sub">${S.homework.filter(x=>!x.done).length} homework pending</div>
   </div>`;
 
-  // Books for tomorrow
-  h += `<div class="card"><div class="card-title">Pack for tomorrow</div>`;
-  if(books.length) {
-    h += `<div class="books-strip">${books.map(b=>`<div class="book-pill">${b}</div>`).join('')}</div>`;
-  } else {
-    h += `<p style="font-size:13px;color:var(--text2);font-family:var(--font2);">Upload today's worksheet to see books needed.</p>`;
-  }
-  h += `</div>`;
-
-  // HW due
+  // HW due today
   if(hw.length) {
     h += `<div class="card"><div class="card-title">Homework to complete</div>`;
-    hw.forEach(item => {
-      h += hwCardHTML(item);
-    });
+    hw.forEach(item => { h += hwCardHTML(item); });
     h += `</div>`;
   }
 
-  // Today's schedule
+  // Combined schedule + books
   if(!tt) {
     h += `<div class="card"><div class="empty"><div class="empty-icon">🎉</div><div class="empty-text">No school today!</div></div></div>`;
   } else {
-    h += `<div class="card"><div class="card-title">Today's schedule</div><div class="sched-list">`;
-    tt.forEach(p => { h += schedRowHTML(p); });
+    h += `<div class="card"><div class="card-title">Tomorrow's schedule & books to carry</div><div class="sched-list">`;
+    tt.forEach(p => { h += schedRowWithBooksHTML(p); });
     h += `</div></div>`;
   }
 
@@ -546,14 +535,6 @@ function renderTomorrow() {
     <div class="day-banner-sub">Next school day</div>
   </div>`;
 
-  h += `<div class="card"><div class="card-title">Books to carry</div>`;
-  if(books.length) {
-    h += `<div class="books-strip">${books.map(b=>`<div class="book-pill">${b}</div>`).join('')}</div>`;
-  } else {
-    h += `<p style="font-size:13px;color:var(--text2);font-family:var(--font2);">No specific books noted.</p>`;
-  }
-  h += `</div>`;
-
   if(hwDue.length) {
     h += `<div class="card"><div class="card-title">Due tomorrow</div>`;
     hwDue.forEach(item => { h += hwCardHTML(item); });
@@ -563,8 +544,8 @@ function renderTomorrow() {
   if(!tt) {
     h += `<div class="card"><div class="empty"><div class="empty-icon">😴</div><div class="empty-text">Weekend — no school!</div></div></div>`;
   } else {
-    h += `<div class="card"><div class="card-title">Schedule</div><div class="sched-list">`;
-    tt.forEach(p => { h += schedRowHTML(p); });
+    h += `<div class="card"><div class="card-title">Schedule & books to carry</div><div class="sched-list">`;
+    tt.forEach(p => { h += schedRowWithBooksHTML(p); });
     h += `</div></div>`;
   }
 
@@ -586,6 +567,34 @@ function schedRowHTML(p) {
     <div class="sched-content">
       <div class="sched-subj">${sbadge(p.s)}</div>
       <div class="sched-teacher">${p.tc||''}</div>
+    </div>
+  </div>`;
+}
+
+function schedRowWithBooksHTML(p) {
+  if(p.s === 'Break') {
+    return `<div class="sched-item break-item">
+      <div class="sched-time-col"><div class="sched-period">BREAK</div><div class="sched-time">${p.t}</div></div>
+      <div class="break-dot"></div><div class="break-label">Break time</div>
+    </div>`;
+  }
+  const subjBooks = (ALWAYS_BOOKS[p.s]||[]);
+  const hwBooks = S.homework
+    .filter(h=>!h.done && h.subj===p.s)
+    .flatMap(h=>h.books||[]);
+  const allBooks = [...new Set([...subjBooks, ...hwBooks])];
+  const booksHtml = allBooks.length
+    ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">${allBooks.map(b=>`<span style="font-size:10px;padding:2px 8px;border-radius:100px;background:var(--bg3);color:var(--text2);font-family:var(--font2);font-weight:600;">${b}</span>`).join('')}</div>`
+    : '';
+  return `<div class="sched-item">
+    <div class="sched-time-col">
+      <div class="sched-period">Period ${p.p}</div>
+      <div class="sched-time">${p.t}</div>
+    </div>
+    <div class="sched-content">
+      <div class="sched-subj">${sbadge(p.s)}</div>
+      <div class="sched-teacher">${p.tc||''}</div>
+      ${booksHtml}
     </div>
   </div>`;
 }
