@@ -397,7 +397,24 @@ const SUBJ_CLS = {
 };
 
 function loadState() {
-  try { const s = localStorage.getItem('jiana-pwa-v1'); if(s) return JSON.parse(s); } catch(e){}
+  try {
+    const s = localStorage.getItem('jiana-pwa-v1');
+    if(s) {
+      const parsed = JSON.parse(s);
+      let dirty = false;
+      // Fix timetable — old versions used short keys (Mo/Tu) or had empty data
+      if(!parsed.timetable || !parsed.timetable.Monday || !Array.isArray(parsed.timetable.Monday) || parsed.timetable.Monday.length === 0) {
+        parsed.timetable = DEFAULT_TT;
+        parsed.ttUpdated = '11-04-2026';
+        dirty = true;
+      }
+      if(!parsed.homework) { parsed.homework = []; dirty = true; }
+      if(!parsed.log) { parsed.log = []; dirty = true; }
+      if(!parsed.nextId) { parsed.nextId = 50; dirty = true; }
+      if(dirty) localStorage.setItem('jiana-pwa-v1', JSON.stringify(parsed));
+      return parsed;
+    }
+  } catch(e){ localStorage.removeItem('jiana-pwa-v1'); }
   return {
     nextId:50,
     timetable: DEFAULT_TT,
@@ -796,6 +813,14 @@ Rules: s=subject short name (Eng/Math/Hindi/EVS/Marathi/Computer/PE/Library/Musi
 }
 
 // ── Init ──────────────────────────────────────────────────────
+// Clear old incompatible cache versions
+const CACHE_VERSION = 'v3';
+if(localStorage.getItem('jiana-cache-ver') !== CACHE_VERSION) {
+  localStorage.removeItem('jiana-pwa-v1');
+  localStorage.setItem('jiana-cache-ver', CACHE_VERSION);
+  location.reload();
+}
+
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
@@ -803,6 +828,9 @@ if('serviceWorker' in navigator) {
 const hour = new Date().getHours();
 const greet = hour < 12 ? 'Good morning!' : hour < 17 ? 'Good afternoon!' : 'Good evening!';
 document.getElementById('topbar-title').textContent = greet;
+
+// Also update switchTab titles dynamically
+const _origSwitchTab = switchTab;
 
 renderToday();
 </script>
