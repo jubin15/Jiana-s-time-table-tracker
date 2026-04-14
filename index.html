@@ -397,25 +397,7 @@ const SUBJ_CLS = {
 };
 
 function loadState() {
-  try {
-    const s = localStorage.getItem('jiana-pwa-v1');
-    if(s) {
-      const parsed = JSON.parse(s);
-      let dirty = false;
-      // Fix timetable — old versions used short keys (Mo/Tu) or had empty data
-      if(!parsed.timetable || !parsed.timetable.Monday || !Array.isArray(parsed.timetable.Monday) || parsed.timetable.Monday.length === 0) {
-        parsed.timetable = DEFAULT_TT;
-        parsed.ttUpdated = '11-04-2026';
-        dirty = true;
-      }
-      if(!parsed.homework) { parsed.homework = []; dirty = true; }
-      if(!parsed.log) { parsed.log = []; dirty = true; }
-      if(!parsed.nextId) { parsed.nextId = 50; dirty = true; }
-      if(dirty) localStorage.setItem('jiana-pwa-v1', JSON.stringify(parsed));
-      return parsed;
-    }
-  } catch(e){ localStorage.removeItem('jiana-pwa-v1'); }
-  return {
+  const defaults = {
     nextId:50,
     timetable: DEFAULT_TT,
     ttUpdated:'11-04-2026',
@@ -429,6 +411,18 @@ function loadState() {
     ],
     log:[]
   };
+  try {
+    const s = localStorage.getItem('jiana-pwa-v1');
+    if(s) {
+      const p = JSON.parse(s);
+      if(!p.timetable || !p.timetable.Monday || !Array.isArray(p.timetable.Monday) || p.timetable.Monday.length===0) p.timetable = DEFAULT_TT;
+      if(!p.homework) p.homework = defaults.homework;
+      if(!p.log) p.log = [];
+      if(!p.nextId) p.nextId = 50;
+      return p;
+    }
+  } catch(e){}
+  return defaults;
 }
 
 let S = loadState();
@@ -767,7 +761,7 @@ function addManualHW() {
   setTimeout(()=>{ const el=document.getElementById('manual-result'); if(el) el.innerHTML=''; },3000);
 }
 
-
+function handleTtFile(input) {
   const file = input.files[0]; if(!file) return;
   document.getElementById('tt-label').textContent = file.name;
   const r = new FileReader();
@@ -813,14 +807,6 @@ Rules: s=subject short name (Eng/Math/Hindi/EVS/Marathi/Computer/PE/Library/Musi
 }
 
 // ── Init ──────────────────────────────────────────────────────
-// Clear old incompatible cache versions
-const CACHE_VERSION = 'v3';
-if(localStorage.getItem('jiana-cache-ver') !== CACHE_VERSION) {
-  localStorage.removeItem('jiana-pwa-v1');
-  localStorage.setItem('jiana-cache-ver', CACHE_VERSION);
-  location.reload();
-}
-
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
@@ -828,9 +814,6 @@ if('serviceWorker' in navigator) {
 const hour = new Date().getHours();
 const greet = hour < 12 ? 'Good morning!' : hour < 17 ? 'Good afternoon!' : 'Good evening!';
 document.getElementById('topbar-title').textContent = greet;
-
-// Also update switchTab titles dynamically
-const _origSwitchTab = switchTab;
 
 renderToday();
 </script>
