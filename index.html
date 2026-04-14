@@ -426,11 +426,68 @@ function loadState() {
 }
 
 let S = loadState();
-function save() { try{ localStorage.setItem('jiana-pwa-v1',JSON.stringify(S)); }catch(e){} }
 function nid() { return S.nextId++; }
 
-// ── API proxy URL — update this after deploying Cloudflare Worker ──
 const API_URL = 'https://jianaschooltrackercloudflareworkerapiproxydeploy.jubin15.workers.dev';
+const DATA_URL = API_URL + '/data';
+
+// Save locally AND push to cloud
+function save() {
+  try { localStorage.setItem('jiana-pwa-v1', JSON.stringify(S)); } catch(e){}
+  // Push homework + log to shared cloud (fire and forget)
+  fetch(DATA_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ homework: S.homework, log: S.log })
+  }).catch(() => {});
+}
+
+// Pull latest data from cloud and merge
+async function syncFromCloud() {
+  try {
+    const resp = await fetch(DATA_URL);
+    if (!resp.ok) return;
+    const cloud = await resp.json();
+
+    // Merge cloud homework into local — cloud wins for new entries
+    // Keep local done states (in case marked done locally before sync)
+    const localDoneIds = new Set(S.homework.filter(h=>h.done).map(h=>h.id));
+
+    // Build merged list: start with cloud data
+    const merged = (cloud.homework||[]).map(h => {
+      // If we have a local done record for this id, mark it done
+      if (localDoneIds.has(h.id)) return {...h, done:true};
+      // Also check by subject+task for older entries without matching ids
+      const localMatch = S.homework.find(l => l.subj===h.subj && l.task===h.task && l.done);
+      if (localMatch) return {...h, done:true};
+      return h;
+    });
+
+    // Add any local entries not in cloud yet (uploaded on this device but not pushed yet)
+    S.homework.forEach(local => {
+      const inCloud = merged.some(c => c.id===local.id || (c.subj===local.subj && c.task===local.task));
+      if (!inCloud) merged.push(local);
+    });
+
+    S.homework = merged;
+    S.log = cloud.log || S.log;
+    if (!S.nextId || S.nextId < 50) S.nextId = 50;
+    // Ensure nextId is above all existing ids
+    merged.forEach(h => { if(h.id >= S.nextId) S.nextId = h.id + 1; });
+
+    try { localStorage.setItem('jiana-pwa-v1', JSON.stringify(S)); } catch(e){}
+
+    // Re-render current tab with fresh data
+    if(currentTab==='today') renderToday();
+    else if(currentTab==='tomorrow') renderTomorrow();
+    else if(currentTab==='homework') renderHomework();
+    else if(currentTab==='more') renderMore();
+
+    console.log('Synced from cloud: '+merged.length+' homework items');
+  } catch(e) {
+    console.log('Sync failed (offline?):', e.message);
+  }
+}
 
 function addLog(msg) {
   const now = new Date();
@@ -451,9 +508,9 @@ function switchTab(tab) {
   currentTab = tab;
   const titles = {today:'Good evening!',tomorrow:'Tomorrow',homework:'Homework',upload:'Upload',more:'More'};
   document.getElementById('topbar-title').textContent = titles[tab]||'';
-  if(tab==='today') renderToday();
-  else if(tab==='tomorrow') renderTomorrow();
-  else if(tab==='homework') renderHomework();
+  if(tab==='today') { renderToday(); syncFromCloud(); }
+  else if(tab==='tomorrow') { renderTomorrow(); syncFromCloud(); }
+  else if(tab==='homework') { renderHomework(); syncFromCloud(); }
   else if(tab==='more') renderMore();
 }
 
@@ -707,18 +764,18 @@ async function extractWorksheet() {
         model:'claude-sonnet-4-20250514', max_tokens:1500,
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:'image/jpeg',data:wsB64}},
-          {type:'text',text:`Daily workdone sheet from Jiana's school (Class 4I, grade 4, age ~9, Mumbai). Today: ${dateStr}. Today's subjects: ${subjects}.
+          {type:'text',text:`Daily workdone sheet from Jiana's school (Class 4I, grade 4, age ~9, Mumbai). Today is approximately ${dateStr}. Today's subjects: ${subjects}.
 
 Return ONLY valid JSON, no markdown:
-{"date":"DD/MM","homework":[{"subject":"...","task":"...","books":["Eng NB","Eng TB"],"dueDay":"Monday","needsReview":false}],"notes":"...","classWork":[{"subject":"...","done":"..."}]}
+{"date":"DD/MM/YYYY","homework":[{"subject":"...","task":"...","books":["Eng NB","Eng TB"],"dueDay":"Monday","needsReview":false}],"notes":"...","classWork":[{"subject":"...","done":"..."}]}
 
 Rules:
+- IMPORTANT: Read the actual date written on the sheet (top right corner usually shows Date and Day). Use that date for the "date" field in format DD/MM/YYYY. If not readable, use today's date.
 - subject = one of: Eng, Math, Hindi, EVS, Marathi, Computer, PE, Library, Music/Dance, ILP/Activity, Life Skills, A/Cr
-- books format: "Eng NB", "Math TB" etc. NB=Notebook TB=Textbook
-- dueDay = next school day. If Friday→Monday, Monday→Tuesday etc.
-- For Hindi and Marathi subjects: handwriting may be in Devanagari script. Extract whatever you can read. If you cannot read it confidently, set task to "⚠ Check manually — handwriting unclear" and set needsReview=true. Still include the entry.
-- For all other subjects: extract normally, set needsReview=false.
-- Always include ALL subjects that have homework written, even if you can only partially read them.`}
+- books: list EXACTLY what books are mentioned in the "Books to be brought" column. Format: "Eng NB", "Math TB", "EVS NB" etc. NB=Notebook TB=Textbook WS=Worksheet
+- dueDay = next school day after the sheet date. If sheet is Friday→Monday, Monday→Tuesday etc.
+- For Hindi and Marathi: if handwriting unclear set needsReview=true and task="⚠ Check manually — handwriting unclear". Still include the entry with whatever books you can read.
+- Always include ALL subjects that have any homework or books mentioned.`}
         ]}]
       })
     });
@@ -726,23 +783,56 @@ Rules:
     if (!data.content) throw new Error('API said: ' + (data.error ? data.error.message : JSON.stringify(data)));
     const text = data.content.map(i=>i.text||'').join('');
     const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
-    const dateAdded = parsed.date||new Date().getDate()+'/'+(new Date().getMonth()+1);
-    parsed.homework.forEach(h=>{
-      S.homework.push({id:nid(),subj:h.subject,task:h.task,books:h.books||[],dueDay:h.dueDay||'Monday',done:false,addedDate:dateAdded,needsReview:h.needsReview||false});
+
+    // Use date from sheet itself
+    const dateAdded = parsed.date || (new Date().getDate()+'/'+(new Date().getMonth()+1)+'/'+new Date().getFullYear());
+
+    // Only add entries that are not already present (same subject + same task = duplicate)
+    // Never delete existing homework — only skip exact duplicates
+    let added = 0, skipped = 0;
+    parsed.homework.forEach(h => {
+      const isDuplicate = S.homework.some(existing =>
+        !existing.done &&
+        existing.subj === h.subject &&
+        existing.task === h.task
+      );
+      if (!isDuplicate) {
+        S.homework.push({
+          id:nid(), subj:h.subject, task:h.task,
+          books:h.books||[], dueDay:h.dueDay||'Monday',
+          done:false, addedDate:dateAdded, needsReview:h.needsReview||false
+        });
+        added++;
+      } else {
+        // Update books even if task is duplicate — sheet may have new books listed
+        const existing = S.homework.find(e => !e.done && e.subj===h.subject && e.task===h.task);
+        if(existing && h.books && h.books.length) {
+          existing.books = [...new Set([...existing.books, ...h.books])];
+        }
+        skipped++;
+      }
     });
-    addLog('Worksheet uploaded ('+dateAdded+'): '+parsed.homework.length+' homework items added');
+
+    addLog('Sheet uploaded ('+dateAdded+'): '+added+' new, '+skipped+' updated');
     save();
-    let res = `<div class="note-green" style="margin-top:12px;">Extracted from worksheet (${dateAdded})</div>`;
+
+    let res = `<div class="note-green" style="margin-top:12px;"><strong>Sheet date: ${dateAdded}</strong> — ${added} new homework added${skipped>0?' · '+skipped+' already existed (books updated)':''}</div>`;
     const needsReview = parsed.homework.filter(h=>h.needsReview);
     const extracted = parsed.homework.filter(h=>!h.needsReview);
     if(extracted.length) {
       res += `<div style="margin-top:10px;">`;
-      extracted.forEach(h=>{ res+=`<div class="hw-card" style="margin-bottom:8px;">${sbadge(h.subject)} <span style="font-size:13px;color:var(--text);margin-left:4px;">${h.task}</span><div class="hw-meta" style="margin-top:4px;">Due ${h.dueDay}</div></div>`; });
+      extracted.forEach(h=>{
+        res+=`<div class="hw-card" style="margin-bottom:8px;">
+          ${sbadge(h.subject)}
+          <span style="font-size:13px;color:var(--text);margin-left:4px;">${h.task}</span>
+          <div class="hw-meta" style="margin-top:4px;">Due ${h.dueDay} · Books: ${(h.books||[]).join(', ')||'—'}</div>
+        </div>`;
+      });
       res += `</div>`;
     }
     if(needsReview.length) {
       res += `<div class="note-gold" style="margin-top:10px;padding:12px;"><div style="font-weight:700;margin-bottom:8px;">⚠ Check manually — handwriting unclear:</div>`;
-      needsReview.forEach(h=>{ res+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">${sbadge(h.subject)}<span style="font-size:13px;">Homework noted but could not be read — please check the sheet</span></div>`; });
+      needsReview.forEach(h=>{ res+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">${sbadge(h.subject)}<span style="font-size:13px;">Homework noted · Books: ${(h.books||[]).join(', ')||'check sheet'}</span></div>`; });
       res += `</div>`;
     }
     if(parsed.notes) res+=`<div class="note-gold" style="margin-top:8px;">${parsed.notes}</div>`;
@@ -825,6 +915,10 @@ const greet = hour < 12 ? 'Good morning!' : hour < 17 ? 'Good afternoon!' : 'Goo
 document.getElementById('topbar-title').textContent = greet;
 
 renderToday();
+
+// Sync from cloud on load and every 60 seconds
+syncFromCloud();
+setInterval(syncFromCloud, 60000);
 </script>
 </body>
 </html>
